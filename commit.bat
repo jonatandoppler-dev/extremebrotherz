@@ -1,21 +1,19 @@
 @echo off
 cd /d %~dp0
 
-:: Datum & Uhrzeit holen
-for /f "tokens=2-4 delims=.-/ " %%a in ('date /t') do set DATE=%%c-%%b-%%a
-for /f "tokens=1-2 delims=: " %%a in ('time /t') do set TIME=%%a-%%b
+:: Datum & Uhrzeit sauber holen (DE-Format erzwingen)
+for /f "tokens=2 delims==" %%I in ('wmic os get LocalDateTime /value') do set dt=%%I
 
-:: Commit Message bauen
+set DATE=%dt:~6,2%.%dt:~4,2%.%dt:~0,4%
+set TIME=%dt:~8,2%.%dt:~10,2%.%dt:~12,2%
+
 set MSG=update_%DATE%_%TIME%
 
-:: Git Befehle
 git add .
 git commit -m "%MSG%"
 git push
 
 echo.
-echo ==========================
 echo Push fertig!
 echo Commit: %MSG%
-echo ==========================
 pause
