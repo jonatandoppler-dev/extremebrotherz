@@ -14,5 +14,47 @@
   <button onclick="sendMessage()">Senden</button>
 </div>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "DEIN_KEY",
+    authDomain: "randobrotherz.firebaseapp.com",
+    projectId: "randobrotherz",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Nachricht senden
+  window.sendMessage = async function () {
+    const input = document.getElementById("msg");
+    await addDoc(collection(db, "chat"), {
+      text: input.value,
+      time: Date.now()
+    });
+    input.value = "";
+  };
+
+  // Live Nachrichten
+  const q = query(collection(db, "chat"), orderBy("time"));
+
+  onSnapshot(q, (snapshot) => {
+    const chatBox = document.getElementById("chat");
+    chatBox.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+      chatBox.innerHTML += "<p>" + doc.data().text + "</p>";
+    });
+  });
+</script>
 </body>
 </html>
