@@ -3,17 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Rando Chatroom</title>
+
+  <link rel="stylesheet" href="../css/styles.css">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div style="margin:20px;">
-  <div id="chat" style="height:300px; overflow:auto; background:#111; color:white; padding:10px;"></div>
+<!-- NAVBAR (wie Home) -->
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="../img/extremebrothers.jpg" alt="Logo" height="80" width="80">
+    </a>
 
-  <input id="msg" type="text" placeholder="Schreib was..." />
-  <button onclick="sendMessage()">Senden</button>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+      <div class="navbar-nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link active" href="chat.html">Chat</a>
+        <a class="nav-link" href="locations.html">Locations</a>
+        <a class="nav-link" href="career.html">Career</a>
+        <a class="nav-link" href="members.html">Members</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- CHAT UI -->
+<div class="chat-wrapper">
+
+  <h1 class="chat-title">💬 Rando Chatroom</h1>
+
+  <div id="chat" class="chat-box"></div>
+
+  <div class="chat-input">
+    <input id="msg" type="text" placeholder="Schreib eine Nachricht..." />
+    <button onclick="sendMessage()">Senden</button>
+  </div>
+
 </div>
 
+<!-- BOOTSTRAP JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- FIREBASE CHAT -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
@@ -25,26 +65,32 @@
     orderBy
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  // 🔥 Firebase Config (DEINE DATEN EINSETZEN)
   const firebaseConfig = {
-    apiKey: "DEIN_KEY",
+    apiKey: "DEIN_API_KEY",
     authDomain: "randobrotherz.firebaseapp.com",
     projectId: "randobrotherz",
+    measurementId: "G-4YPZDY1Z7B"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Nachricht senden
+  // 📤 Nachricht senden
   window.sendMessage = async function () {
     const input = document.getElementById("msg");
+
+    if (input.value.trim() === "") return;
+
     await addDoc(collection(db, "chat"), {
       text: input.value,
       time: Date.now()
     });
+
     input.value = "";
   };
 
-  // Live Nachrichten
+  // 📡 Live Chat
   const q = query(collection(db, "chat"), orderBy("time"));
 
   onSnapshot(q, (snapshot) => {
@@ -52,9 +98,12 @@
     chatBox.innerHTML = "";
 
     snapshot.forEach((doc) => {
-      chatBox.innerHTML += "<p>" + doc.data().text + "</p>";
+      chatBox.innerHTML += `<div class="msg">${doc.data().text}</div>`;
     });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
   });
 </script>
+
 </body>
 </html>
