@@ -1,6 +1,6 @@
 # License
 
-Copyright © 2026 Jonatan
+Copyright © 2026 Doppler Jonatan
 
 All rights reserved.
 
